@@ -1,158 +1,117 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const Home = () => {
+const Home: React.FC = () => {
   const navigate = useNavigate();
-  const [viewAll, setViewAll] = useState(false);
-  const [query, setQuery] = useState('');
+  const [selectedJob, setSelectedJob] = useState<any>(null);
+  const [isDark, setIsDark] = useState(false); // Screenshot ke hisab se default light rakha hai
 
-  // 1. User Profile base skills (Isi ke base par jobs filter hongi)
-  const userProfile = {
-    name: "Sakshi Rathod",
-    skills: ["React", "Node.js", "MongoDB", "TypeScript", "Full Stack"], // In skills ko change karne par jobs badal jayengi
-  };
+  const allJobs = Array.from({ length: 12 }, (_, i) => ({
+    id: i + 1,
+    title: ["Full Stack Developer", "Cloud Engineer", "UI/UX Designer", "Data Scientist"][i % 4],
+    company: ["EliteHire", "AeroTech", "Google", "InnovateX"][i % 4],
+    location: ["Remote", "Bangalore", "Mumbai", "Pune"][i % 4],
+    salary: "₹15L - ₹25L PA",
+    workingDays: "5 Days (Mon-Fri)",
+    skills: ["React", "Node.js", "MongoDB", "AWS", "Tailwind"],
+    email: "hr@elitehire.com",
+    description: "Hum ek energetic developer ki talash mein hain jo scalable web apps bana sake aur team ke saath collaborate kar sake.",
+    posted: (i + 1) + "h ago"
+  }));
 
-  // 2. 100 Jobs Database with Skills requirement
-  const allJobs = Array.from({ length: 100 }, (_, i) => {
-    const roles = ["Full Stack Developer", "Frontend Engineer", "Backend Intern", "UI/UX Designer", "DevOps Engineer", "Python Developer"];
-    const role = roles[i % roles.length];
-    
-    // Har job ki apni required skills hain
-    const jobSkills = [
-      ["React", "Node.js", "Full Stack"],
-      ["React", "JavaScript", "Tailwind"],
-      ["Node.js", "Express", "MongoDB"],
-      ["Figma", "UI/UX", "CSS"],
-      ["Docker", "AWS", "Kubernetes"],
-      ["Python", "Django", "SQL"]
-    ][i % 6];
-
-    return {
-      id: i + 1,
-      title: role,
-      company: ["EliteHire", "Google", "Amazon", "Wpgenius", "TCS", "Microsoft"][i % 6],
-      location: ["Remote", "Pune", "Bangalore", "Mumbai"][i % 4],
-      salary: "₹12-18 LPA",
-      vacancies: 10,
-      hired: 3,
-      posted: (i % 7) + "d ago",
-      requiredSkills: jobSkills
-    };
-  });
-
-  // 3. --- DYNAMIC RECOMMENDATION LOGIC ---
-  // Ye logic check karta hai ki kya user ki koi bhi skill job ki requirement se match karti hai
-  const recommendedJobs = allJobs.filter(job => 
-    job.requiredSkills.some(skill => userProfile.skills.includes(skill))
-  );
-
-  const displayJobs = viewAll ? allJobs : recommendedJobs;
-
-  const handleQuerySubmit = () => {
-    if(query.trim()) {
-      alert("Your query has been submitted!");
-      setQuery('');
-    }
+  const theme = {
+    bg: isDark ? '#0a0a0f' : '#f4f7fa',
+    navBg: isDark ? '#11111d' : '#ffffff',
+    card: isDark ? '#11111d' : '#ffffff',
+    text: isDark ? '#ffffff' : '#1e293b',
+    subText: isDark ? '#94a3b8' : '#64748b',
+    border: isDark ? '#1f1f2e' : '#e2e8f0',
+    accent: '#6366f1'
   };
 
   return (
-    <div style={{ background: '#f8fafc', minHeight: '100vh', fontFamily: 'Inter, sans-serif' }}>
+    <div style={{ minHeight: '100vh', background: theme.bg, color: theme.text, transition: '0.3s', fontFamily: 'Inter, sans-serif' }}>
       
       {/* NAVBAR */}
-      <nav style={navStyle}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '40px' }}>
-          <div onClick={() => navigate('/home')} style={{ fontSize: '24px', fontWeight: '800', color: '#1a73e8', cursor: 'pointer' }}>ELITE<span style={{color:'#1e293b'}}>HIRE</span></div>
-          <div style={{ display: 'flex', gap: '25px', fontSize: '14px', color: '#64748b', fontWeight: '600' }}>
-            <span onClick={() => navigate('/prepare')} style={{cursor:'pointer'}}>Prepare</span>
-            <span onClick={() => navigate('/opportunities')} style={{cursor:'pointer'}}>Opportunities</span>
-          </div>
+      <nav style={{ display: 'flex', justifyContent: 'space-between', padding: '15px 5%', background: theme.navBg, borderBottom: `1px solid ${theme.border}`, position: 'sticky', top: 0, zIndex: 10 }}>
+        <div style={{ fontSize: '20px', fontWeight: 800, color: theme.accent, display: 'flex', alignItems: 'center', gap: '8px' }}>
+          ✦ ELITEHIRE
         </div>
-        <div onClick={() => navigate('/profile')} style={profileTrigger}>
-          <div style={avatar}>S</div>
-          <span style={{ fontWeight: '600' }}>{userProfile.name}</span>
+        
+        <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
+          <button onClick={() => setIsDark(!isDark)} style={{ padding: '8px 15px', borderRadius: '20px', border: `1px solid ${theme.accent}`, background: 'transparent', color: theme.accent, cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}>
+            {isDark ? '☀️ Light' : '🌙 Dark'}
+          </button>
+          <button onClick={() => navigate('/profile')} style={{ background: theme.accent, color: '#fff', border: 'none', padding: '8px 18px', borderRadius: '8px', cursor: 'pointer', fontWeight: 600 }}>Profile</button>
         </div>
       </nav>
 
-      <div style={{ maxWidth: '1200px', margin: '40px auto', padding: '0 20px' }}>
+      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '40px 20px' }}>
+        <h2 style={{ fontSize: '32px', marginBottom: '30px', fontWeight: 800 }}>Job Opportunities</h2>
         
-        {/* HEADER SECTION */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '30px' }}>
-          <div>
-            <h2 style={{ fontSize: '26px', fontWeight: '800', color: '#1e293b' }}>
-              {viewAll ? "All Available Jobs" : "Jobs Recommended for your Skills"}
-            </h2>
-            <p style={{color: '#64748b', fontSize: '14px'}}>
-              {viewAll ? `Showing all ${allJobs.length} jobs` : `Showing ${recommendedJobs.length} jobs matching: ${userProfile.skills.join(', ')}`}
-            </p>
-          </div>
-          <button onClick={() => setViewAll(!viewAll)} style={toggleBtn}>
-            {viewAll ? "Back to Recommendations" : `View All ${allJobs.length} Jobs`}
-          </button>
-        </div>
-
-        {/* JOB GRID */}
-        <div style={jobGrid}>
-          {displayJobs.map((job) => (
-            <div key={job.id} style={jobCard}>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <div style={logoBox}>{job.company[0]}</div>
-                <span style={{fontSize:'12px', color:'#94a3b8'}}>{job.posted}</span>
-              </div>
-              <h3 style={{margin:'15px 0 5px', fontSize:'18px'}}>{job.title}</h3>
-              <p style={{color:'#64748b', fontSize:'14px', marginBottom:'10px'}}>{job.company} • {job.location}</p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '30px' }}>
+          {allJobs.map(job => (
+            <div key={job.id} 
+                 style={{ background: theme.card, padding: '25px', borderRadius: '24px', border: `1px solid ${theme.border}`, transition: '0.3s', boxShadow: isDark ? 'none' : '0 10px 25px rgba(0,0,0,0.03)' }}>
               
-              {/* Job Required Skills Badges */}
-              <div style={{display:'flex', gap:'5px', flexWrap:'wrap', marginBottom:'15px'}}>
-                {job.requiredSkills.map(skill => (
-                  <span key={skill} style={skillBadge}>{skill}</span>
-                ))}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '15px' }}>
+                <span style={{ background: isDark ? '#1f1f2e' : '#f1f5f9', color: theme.accent, padding: '6px 14px', borderRadius: '10px', fontSize: '11px', fontWeight: 800, letterSpacing: '0.5px' }}>{job.company}</span>
+                <span style={{ color: theme.subText, fontSize: '11px' }}>{job.posted}</span>
               </div>
 
-              <div style={statsRow}>
-                <small>Vacancies: <b>{job.vacancies}</b></small>
-                <small>Hired: <b style={{color:'#16a34a'}}>{job.hired}</b></small>
+              <h3 style={{ fontSize: '22px', margin: '0 0 8px 0', fontWeight: 700 }}>{job.title}</h3>
+              <p style={{ color: theme.subText, fontSize: '14px', margin: '5px 0' }}>📍 {job.location} • {job.salary}</p>
+              
+              <div style={{ marginTop: '15px', display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                {job.skills.slice(0, 3).map(s => <span key={s} style={{ fontSize: '10px', background: isDark ? '#0a0a0f' : '#f8fafc', padding: '4px 10px', borderRadius: '6px', border: `1px solid ${theme.border}`, color: theme.subText }}>{s}</span>)}
               </div>
 
-              <button onClick={() => navigate('/apply')} style={applyBtn}>Apply Now</button>
+              {/* ACTION BUTTONS */}
+              <div style={{ display: 'flex', gap: '12px', marginTop: '25px' }}>
+                <button 
+                  onClick={() => setSelectedJob(job)}
+                  style={{ flex: 1, padding: '12px', borderRadius: '12px', border: `1.5px solid ${theme.accent}`, background: 'transparent', color: theme.accent, fontWeight: 700, cursor: 'pointer', fontSize: '13px' }}>
+                  View Details
+                </button>
+                <button 
+                  onClick={() => navigate('/application-form')} // Personal/Professional Form Link
+                  style={{ flex: 1, padding: '12px', borderRadius: '12px', border: 'none', background: theme.accent, color: '#fff', fontWeight: 700, cursor: 'pointer', fontSize: '13px' }}>
+                  Apply Now
+                </button>
+              </div>
             </div>
           ))}
         </div>
+      </div>
 
-        {/* REVIEWS & QUERIES SECTION */}
-        <div style={querySection}>
-          <div style={{ flex: 1 }}>
-            <h3 style={{ color: '#1e293b', marginBottom: '10px' }}>Have any Questions?</h3>
-            <p style={{ color: '#64748b', fontSize: '14px' }}>Contact support for more info:</p>
-            <p style={{ fontSize: '14px', color: '#64748b' }}>📞 +91 800-456-7890 | ✉️ help@elitehire.com</p>
-          </div>
-          <div style={{ flex: 1, background: '#fff', padding: '25px', borderRadius: '20px' }}>
-            <textarea 
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Ask a question about these jobs..." 
-              style={textAreaStyle}
-            />
-            <button onClick={handleQuerySubmit} style={submitBtn}>Submit</button>
+      {/* MODAL (Job Details) */}
+      {selectedJob && (
+        <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.7)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 100, backdropFilter: 'blur(5px)' }} onClick={() => setSelectedJob(null)}>
+          <div style={{ background: theme.card, width: '90%', maxWidth: '550px', borderRadius: '30px', padding: '40px', border: `1px solid ${theme.border}`, position: 'relative' }} onClick={e => e.stopPropagation()}>
+            <button onClick={() => setSelectedJob(null)} style={{ position: 'absolute', top: '25px', right: '25px', background: 'none', border: 'none', color: theme.text, fontSize: '28px', cursor: 'pointer' }}>×</button>
+            <h2 style={{ color: theme.accent, fontSize: '28px', marginBottom: '10px' }}>{selectedJob.title}</h2>
+            <p style={{ fontWeight: 600, marginBottom: '25px' }}>{selectedJob.company} • {selectedJob.location}</p>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '25px' }}>
+              <div style={{ background: isDark ? '#1a1a2e' : '#f8fafc', padding: '15px', borderRadius: '15px' }}>
+                <small style={{ color: theme.subText }}>Salary</small><br/><strong>{selectedJob.salary}</strong>
+              </div>
+              <div style={{ background: isDark ? '#1a1a2e' : '#f8fafc', padding: '15px', borderRadius: '15px' }}>
+                <small style={{ color: theme.subText }}>Shift</small><br/><strong>{selectedJob.workingDays}</strong>
+              </div>
+            </div>
+            <h4 style={{ color: theme.accent, fontSize: '13px', textTransform: 'uppercase', marginBottom: '10px' }}>Requirements</h4>
+            <p style={{ color: theme.subText, lineHeight: '1.6', fontSize: '14px' }}>{selectedJob.description}</p>
+            <div style={{ marginTop: '20px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+              {selectedJob.skills.map((s: string) => <span key={s} style={{ background: `${theme.accent}15`, color: theme.accent, padding: '6px 12px', borderRadius: '8px', fontSize: '12px', fontWeight: 600 }}>{s}</span>)}
+            </div>
+            <div style={{ background: isDark ? '#0a0a0f' : '#f1f5f9', padding: '20px', borderRadius: '15px', marginTop: '25px' }}>
+              <p style={{ margin: 0, fontSize: '14px' }}>📧 Contact HR: <b>{selectedJob.email}</b></p>
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };
-
-// --- STYLES ---
-const navStyle: React.CSSProperties = { display: 'flex', justifyContent: 'space-between', padding: '15px 60px', background: '#fff', boxShadow: '0 2px 5px rgba(0,0,0,0.05)', position: 'sticky', top: 0, zIndex: 100 };
-const profileTrigger: React.CSSProperties = { display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' };
-const avatar: React.CSSProperties = { width: '35px', height: '35px', borderRadius: '50%', background: '#1a73e8', color: '#fff', display: 'flex', justifyContent: 'center', alignItems: 'center', fontWeight: 'bold' };
-const jobGrid: React.CSSProperties = { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '25px' };
-const jobCard: React.CSSProperties = { background: '#fff', padding: '20px', borderRadius: '20px', border: '1px solid #eef2f6', display: 'flex', flexDirection: 'column' };
-const logoBox: React.CSSProperties = { width: '40px', height: '40px', background: '#f0f7ff', borderRadius: '10px', display: 'flex', justifyContent: 'center', alignItems: 'center', color: '#1a73e8', fontWeight: 'bold' };
-const skillBadge: React.CSSProperties = { fontSize: '10px', background: '#f1f5f9', padding: '3px 8px', borderRadius: '5px', color: '#475569' };
-const statsRow: React.CSSProperties = { display: 'flex', justifyContent: 'space-between', padding: '10px', background: '#f8fafc', borderRadius: '10px', marginBottom: '15px', marginTop:'auto' };
-const toggleBtn: React.CSSProperties = { padding: '10px 20px', borderRadius: '10px', border: '2px solid #1a73e8', background: 'transparent', color: '#1a73e8', fontWeight: 'bold', cursor: 'pointer' };
-const applyBtn: React.CSSProperties = { width: '100%', padding: '12px', background: '#001f3f', color: '#fff', border: 'none', borderRadius: '10px', fontWeight: 'bold', cursor: 'pointer' };
-const querySection: React.CSSProperties = { marginTop: '80px', padding: '40px', background: '#eef2f6', borderRadius: '30px', display: 'flex', gap: '40px', alignItems: 'center' };
-const textAreaStyle: React.CSSProperties = { width: '100%', height: '80px', padding: '15px', borderRadius: '12px', border: '1px solid #e2e8f0', fontFamily: 'inherit', resize: 'none', marginBottom: '10px', boxSizing: 'border-box' };
-const submitBtn: React.CSSProperties = { background: '#1a73e8', color: '#fff', border: 'none', padding: '12px', borderRadius: '10px', fontWeight: 'bold', cursor: 'pointer', width: '100%' };
 
 export default Home;

@@ -1,20 +1,19 @@
-import { useState, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const Profile = () => {
+const Profile: React.FC = () => {
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   // States
   const [profileImage, setProfileImage] = useState<string | null>(null);
-  const [skills, setSkills] = useState(["React", "Node.js", "MongoDB", "TypeScript"]);
-  const [newSkill, setNewSkill] = useState("");
-  const [activeTab, setActiveTab] = useState('View & Edit');
+  const [skills, setSkills] = useState<string[]>(["React", "Node.js", "TypeScript", "UI/UX"]);
+  const [newSkill, setNewSkill] = useState<string>("");
+  const [activeTab, setActiveTab] = useState<'Overview' | 'Applications'>('Overview');
 
-  // Dummy Data for Applied Jobs
   const appliedJobs = [
-    { id: 1, title: "Full Stack Developer", company: "EliteHire", status: "Under Review", date: "Jan 5, 2026" },
-    { id: 2, title: "Frontend Intern", company: "Google", status: "Shortlisted", date: "Jan 2, 2026" }
+    { id: 1, title: "Full Stack Engineer", company: "EliteHire", status: "Active", date: "Jan 05" },
+    { id: 2, title: "Product Designer", company: "AeroTech", status: "Closed", date: "Dec 28" }
   ];
 
   const handlePhotoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -26,139 +25,135 @@ const Profile = () => {
     }
   };
 
-  const addSkill = () => {
+  const handleAddSkill = () => {
     if (newSkill.trim() && !skills.includes(newSkill)) {
       setSkills([...skills, newSkill]);
       setNewSkill("");
     }
   };
 
-  const removeSkill = (skillToRemove: string) => {
-    setSkills(skills.filter(s => s !== skillToRemove));
-  };
-
   return (
-    <div style={{ background: '#f8fafc', minHeight: '100vh', fontFamily: 'Inter, sans-serif' }}>
-      
-      {/* NAVBAR */}
-      <nav style={navStyle}>
-        <div onClick={() => navigate('/home')} style={{ fontSize: '24px', fontWeight: '800', color: '#1a73e8', cursor: 'pointer' }}>
-          ELITE<span style={{color:'#1e293b'}}>HIRE</span>
+    <div style={styles.container}>
+      {/* GLASSNAV */}
+      <nav style={styles.nav}>
+        <div onClick={() => navigate('/home')} style={styles.logo}>
+          <span style={{color: '#6366f1'}}>✦</span> ELITE<span style={{fontWeight: 300}}>HIRE</span>
         </div>
-        <button onClick={() => navigate('/home')} style={backBtn}>Back to Dashboard</button>
+        <button onClick={() => navigate('/home')} style={styles.backBtn}>Dashboard</button>
       </nav>
 
-      <div style={{ maxWidth: '1100px', margin: '30px auto', padding: '0 20px' }}>
-        
-        {/* PROFILE HEADER */}
-        <div style={profileCard}>
-          <div style={{ display: 'flex', gap: '30px', alignItems: 'center' }}>
-            <div style={avatarWrapper} onClick={() => fileInputRef.current?.click()}>
-               <div style={{...avatarCircle, backgroundImage: `url(${profileImage})`, backgroundSize: 'cover'}}>
-                 {!profileImage && <span style={{fontSize: '40px', color: '#cbd5e1'}}>+</span>}
-               </div>
-               <input type="file" ref={fileInputRef} onChange={handlePhotoUpload} style={{display:'none'}} accept="image/*" />
-               <span style={addPhotoText}>Update Photo</span>
+      <div style={styles.contentWrapper}>
+        {/* HERO SECTION */}
+        <header style={styles.heroCard}>
+          <div style={styles.heroFlex}>
+            <div style={styles.avatarContainer} onClick={() => fileInputRef.current?.click()}>
+              <div style={{...styles.avatarCircle, backgroundImage: profileImage ? `url(${profileImage})` : 'none'}}>
+                {!profileImage && "SR"}
+              </div>
+              <input type="file" ref={fileInputRef} onChange={handlePhotoUpload} style={{display:'none'}} accept="image/*" />
             </div>
-            <div style={{ flex: 1 }}>
-              <h1 style={{ margin: 0, fontSize: '28px' }}>SAKSHI RATHOD</h1>
-              <p style={{ color: '#64748b' }}>B.Tech/B.E. Computers • Sipna College of Engineering</p>
-              <div style={contactRow}>
-                <span>📍 Amravati</span>
-                <span>📞 +91 93073 96265</span>
-                <span>✉️ sakshi@email.com</span>
+            
+            <div style={styles.userInfo}>
+              <h1 style={styles.userName}>Sakshi Rathod</h1>
+              <p style={styles.userSub}>Full Stack Developer • Sipna College</p>
+              <div style={styles.badges}>
+                <span style={styles.badge}>📍 Amravati</span>
+                <span style={styles.badge}>✉️ sakshi@email.com</span>
               </div>
             </div>
-            <div style={completionBadge}>Profile Strength: 85%</div>
           </div>
+        </header>
+
+        {/* TABS */}
+        <div style={styles.tabBar}>
+          <button 
+            onClick={() => setActiveTab('Overview')} 
+            style={activeTab === 'Overview' ? styles.activeTab : styles.inactiveTab}
+          >Overview</button>
+          <button 
+            onClick={() => setActiveTab('Applications')} 
+            style={activeTab === 'Applications' ? styles.activeTab : styles.inactiveTab}
+          >Applied Jobs</button>
         </div>
 
-        {/* TABS FOR APPLIED JOBS & EDIT */}
-        <div style={tabContainer}>
-          <span onClick={() => setActiveTab('View & Edit')} style={activeTab === 'View & Edit' ? activeTabStyle : tabStyle}>Personal Info & Skills</span>
-          <span onClick={() => setActiveTab('Applied Jobs')} style={activeTab === 'Applied Jobs' ? activeTabStyle : tabStyle}>Applied Jobs ({appliedJobs.length})</span>
-        </div>
-
-        <div style={{ marginTop: '30px' }}>
-          {activeTab === 'View & Edit' ? (
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px' }}>
-              
-              {/* SKILLS SECTION */}
-              <div style={whiteCard}>
-                <h4 style={{marginBottom:'15px'}}>Technical Skills</h4>
-                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginBottom: '20px' }}>
-                  {skills.map(skill => (
-                    <span key={skill} style={skillTag}>
-                      {skill} <span onClick={() => removeSkill(skill)} style={{marginLeft:'8px', cursor:'pointer', color:'#ef4444'}}>×</span>
-                    </span>
+        {/* DYNAMIC CONTENT */}
+        <div style={styles.mainGrid}>
+          {activeTab === 'Overview' ? (
+            <>
+              <section style={styles.card}>
+                <h3 style={styles.cardTitle}>Tech Stack</h3>
+                <div style={styles.skillCloud}>
+                  {skills.map(s => (
+                    <div key={s} style={styles.skillTag}>
+                      {s} <span onClick={() => setSkills(skills.filter(x => x !== s))} style={{marginLeft: 8, cursor:'pointer', opacity: 0.6}}>×</span>
+                    </div>
                   ))}
                 </div>
-                <div style={{ display: 'flex', gap: '10px' }}>
+                <div style={styles.inputGroup}>
                   <input 
-                    type="text" 
-                    value={newSkill} 
+                    style={styles.input} 
+                    placeholder="Add skill..." 
+                    value={newSkill}
                     onChange={(e) => setNewSkill(e.target.value)}
-                    placeholder="Add new skill (e.g. Java)" 
-                    style={inputStyle}
                   />
-                  <button onClick={addSkill} style={addBtn}>Add</button>
+                  <button onClick={handleAddSkill} style={styles.addBtn}>+</button>
                 </div>
-              </div>
+              </section>
 
-              {/* ABOUT SECTION */}
-              <div style={whiteCard}>
-                <h4 style={{marginBottom:'15px'}}>About Me</h4>
-                <p style={{color:'#64748b', fontSize:'14px', lineHeight:'1.6'}}>
-                  Aspiring Full Stack Developer with a passion for building scalable web applications. 
-                  Experienced in MERN stack and currently exploring Cloud Technologies.
-                </p>
-              </div>
-            </div>
+              <section style={styles.card}>
+                <h3 style={styles.cardTitle}>Bio</h3>
+                <p style={styles.text}>Building digital products with modern technologies. Focused on creating clean, responsive user interfaces.</p>
+              </section>
+            </>
           ) : (
-            /* APPLIED JOBS SECTION */
-            <div style={whiteCard}>
-              <h4 style={{marginBottom:'20px'}}>Your Applications</h4>
+            <section style={{...styles.card, width: '100%'}}>
+              <h3 style={styles.cardTitle}>Application History</h3>
               {appliedJobs.map(job => (
-                <div key={job.id} style={jobListItem}>
+                <div key={job.id} style={styles.jobItem}>
                   <div>
-                    <strong style={{fontSize:'16px'}}>{job.title}</strong>
-                    <p style={{margin:0, color:'#64748b', fontSize:'13px'}}>{job.company} • Applied on {job.date}</p>
+                    <div style={{fontWeight: 600}}>{job.title}</div>
+                    <div style={{fontSize: 12, color: '#94a3b8'}}>{job.company} • {job.date}</div>
                   </div>
-                  <span style={{...statusBadge, background: job.status === 'Shortlisted' ? '#ecfdf5' : '#fff7ed', color: job.status === 'Shortlisted' ? '#059669' : '#d97706'}}>
-                    {job.status}
-                  </span>
+                  <span style={job.status === 'Active' ? styles.statusActive : styles.statusClosed}>{job.status}</span>
                 </div>
               ))}
-            </div>
+            </section>
           )}
         </div>
-
       </div>
     </div>
   );
 };
 
-// --- STYLES ---
-const navStyle: React.CSSProperties = { display: 'flex', justifyContent: 'space-between', padding: '15px 60px', background: '#fff', borderBottom: '1px solid #e2e8f0' };
-const backBtn: React.CSSProperties = { padding: '8px 18px', background: '#001f3f', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer' };
-
-const profileCard: React.CSSProperties = { background: '#fff', padding: '30px', borderRadius: '24px', boxShadow: '0 4px 15px rgba(0,0,0,0.03)' };
-const avatarWrapper: React.CSSProperties = { textAlign: 'center', cursor: 'pointer' };
-const avatarCircle: React.CSSProperties = { width: '100px', height: '100px', borderRadius: '50%', border: '3px solid #1a73e8', display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundPosition:'center' };
-const addPhotoText: React.CSSProperties = { fontSize: '11px', color: '#1a73e8', fontWeight: 'bold', marginTop: '8px', display: 'block' };
-const contactRow: React.CSSProperties = { display: 'flex', gap: '20px', fontSize: '13px', color: '#64748b', marginTop: '10px' };
-const completionBadge: React.CSSProperties = { background: '#f0f9ff', color: '#0369a1', padding: '10px 15px', borderRadius: '12px', fontWeight: 'bold', fontSize: '12px' };
-
-const tabContainer: React.CSSProperties = { marginTop: '40px', borderBottom: '2px solid #e2e8f0', display: 'flex', gap: '30px' };
-const tabStyle: React.CSSProperties = { paddingBottom: '12px', cursor: 'pointer', color: '#64748b', fontWeight: '600' };
-const activeTabStyle: React.CSSProperties = { ...tabStyle, color: '#1a73e8', borderBottom: '3px solid #1a73e8' };
-
-const whiteCard: React.CSSProperties = { background: '#fff', padding: '25px', borderRadius: '20px', border: '1px solid #eef2f6' };
-const skillTag: React.CSSProperties = { background: '#f1f5f9', padding: '6px 15px', borderRadius: '50px', fontSize: '14px', fontWeight: '500', color: '#475569' };
-const inputStyle: React.CSSProperties = { flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0' };
-const addBtn: React.CSSProperties = { background: '#1a73e8', color: '#fff', border: 'none', padding: '0 20px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' };
-
-const jobListItem: React.CSSProperties = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px', borderBottom: '1px solid #f1f5f9' };
-const statusBadge: React.CSSProperties = { padding: '5px 12px', borderRadius: '20px', fontSize: '12px', fontWeight: 'bold' };
+// --- STYLES OBJECT (Mobile Responsive) ---
+const styles: { [key: string]: React.CSSProperties } = {
+  container: { background: '#0a0a0f', minHeight: '100vh', color: '#fff', fontFamily: 'sans-serif' },
+  nav: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 5%', borderBottom: '1px solid #1f1f2e', background: 'rgba(10,10,15,0.8)', backdropFilter: 'blur(10px)', position: 'sticky', top: 0, zIndex: 10 },
+  logo: { fontSize: '20px', fontWeight: 800, cursor: 'pointer', letterSpacing: '1px' },
+  backBtn: { padding: '8px 16px', background: '#1f1f2e', border: '1px solid #333', borderRadius: '8px', color: '#fff', cursor: 'pointer' },
+  contentWrapper: { maxWidth: '1000px', margin: '0 auto', padding: '20px' },
+  heroCard: { background: 'linear-gradient(135deg, #161625 0%, #0a0a0f 100%)', padding: '30px', borderRadius: '24px', border: '1px solid #222', marginBottom: '25px' },
+  heroFlex: { display: 'flex', gap: '20px', alignItems: 'center', flexWrap: 'wrap' },
+  avatarCircle: { width: '90px', height: '90px', borderRadius: '24px', background: '#222', backgroundSize: 'cover', backgroundPosition: 'center', display: 'flex', justifyContent: 'center', alignItems: 'center', fontSize: '24px', border: '2px solid #6366f1' },
+  userName: { margin: 0, fontSize: '28px', fontWeight: 800 },
+  userSub: { color: '#94a3b8', margin: '5px 0' },
+  badges: { display: 'flex', gap: '15px', flexWrap: 'wrap' },
+  badge: { fontSize: '13px', color: '#6366f1' },
+  tabBar: { display: 'flex', gap: '10px', marginBottom: '25px', borderBottom: '1px solid #1f1f2e' },
+  activeTab: { padding: '12px 20px', background: 'none', border: 'none', borderBottom: '2px solid #6366f1', color: '#6366f1', fontWeight: 700, cursor: 'pointer' },
+  inactiveTab: { padding: '12px 20px', background: 'none', border: 'none', color: '#666', cursor: 'pointer' },
+  mainGrid: { display: 'flex', flexWrap: 'wrap', gap: '20px' },
+  card: { background: '#11111d', padding: '24px', borderRadius: '20px', border: '1px solid #1f1f2e', flex: '1 1 300px' },
+  cardTitle: { margin: '0 0 20px 0', fontSize: '14px', textTransform: 'uppercase', letterSpacing: '1px', color: '#6366f1' },
+  skillCloud: { display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '20px' },
+  skillTag: { background: '#1f1f2e', padding: '6px 14px', borderRadius: '10px', fontSize: '13px' },
+  inputGroup: { display: 'flex', gap: '10px' },
+  input: { flex: 1, background: '#0a0a0f', border: '1px solid #333', padding: '10px', borderRadius: '8px', color: '#fff' },
+  addBtn: { background: '#6366f1', border: 'none', color: '#fff', width: '40px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' },
+  jobItem: { display: 'flex', justifyContent: 'space-between', padding: '15px 0', borderBottom: '1px solid #1f1f2e' },
+  statusActive: { color: '#4ade80', fontSize: '12px', fontWeight: 700 },
+  statusClosed: { color: '#666', fontSize: '12px' },
+  text: { color: '#94a3b8', lineHeight: 1.6 }
+};
 
 export default Profile;
