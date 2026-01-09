@@ -1,0 +1,36 @@
+/* Purana code hata kar ye dalein */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: #f0f2f5; /* Light professional gray */
+}
+
+/* Ye main class hai jo card ko center karegi */
+.page-container {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  justify-content: center; /* Horizontally center */
+  align-items: center;     /* Vertically center */
+}
+
+.auth-card {
+  background: white;
+  padding: 50px;
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08); /* Soft shadow */
+  width: 100%;
+  max-width: 450px;
+  text-align: center;
+  border: 1px solid #e1e4e8;
+}
